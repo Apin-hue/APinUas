@@ -1,17 +1,22 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, render_template
 from src.services import CategoryService, RecipeService, RatingService
 
-bp = Blueprint('api', __name__, url_prefix='/api')
+bp = Blueprint('api', __name__)
+
+
+@bp.route('/')
+def index():
+    return render_template('index.html')
 
 
 # --- Categories ---
-@bp.route('/categories', methods=['GET'])
+@bp.route('/api/categories', methods=['GET'])
 def get_categories():
     categories = CategoryService.get_all()
     return jsonify([c.to_dict() for c in categories]), 200
 
 
-@bp.route('/categories', methods=['POST'])
+@bp.route('/api/categories', methods=['POST'])
 def create_category():
     data = request.get_json() or {}
     category, errors = CategoryService.create(data)
@@ -20,7 +25,7 @@ def create_category():
     return jsonify(category.to_dict()), 201
 
 
-@bp.route('/categories/<int:category_id>', methods=['DELETE'])
+@bp.route('/api/categories/<int:category_id>', methods=['DELETE'])
 def delete_category(category_id):
     success = CategoryService.delete(category_id)
     if not success:
@@ -29,21 +34,21 @@ def delete_category(category_id):
 
 
 # --- Recipes ---
-@bp.route('/recipes', methods=['GET'])
+@bp.route('/api/recipes', methods=['GET'])
 def get_recipes():
     category_id = request.args.get('category_id', type=int)
     recipes = RecipeService.get_all(category_id=category_id)
     return jsonify([r.to_dict() for r in recipes]), 200
 
 
-@bp.route('/recipes/search', methods=['GET'])
+@bp.route('/api/recipes/search', methods=['GET'])
 def search_recipes():
     keyword = request.args.get('q', '')
     recipes = RecipeService.search(keyword)
     return jsonify([r.to_dict() for r in recipes]), 200
 
 
-@bp.route('/recipes/<int:recipe_id>', methods=['GET'])
+@bp.route('/api/recipes/<int:recipe_id>', methods=['GET'])
 def get_recipe(recipe_id):
     recipe = RecipeService.get_by_id(recipe_id)
     if not recipe:
@@ -51,7 +56,7 @@ def get_recipe(recipe_id):
     return jsonify(recipe.to_dict()), 200
 
 
-@bp.route('/recipes', methods=['POST'])
+@bp.route('/api/recipes', methods=['POST'])
 def create_recipe():
     data = request.get_json() or {}
     recipe, errors = RecipeService.create(data)
@@ -60,7 +65,7 @@ def create_recipe():
     return jsonify(recipe.to_dict()), 201
 
 
-@bp.route('/recipes/<int:recipe_id>', methods=['PUT'])
+@bp.route('/api/recipes/<int:recipe_id>', methods=['PUT'])
 def update_recipe(recipe_id):
     data = request.get_json() or {}
     recipe, errors = RecipeService.update(recipe_id, data)
@@ -69,7 +74,7 @@ def update_recipe(recipe_id):
     return jsonify(recipe.to_dict()), 200
 
 
-@bp.route('/recipes/<int:recipe_id>', methods=['DELETE'])
+@bp.route('/api/recipes/<int:recipe_id>', methods=['DELETE'])
 def delete_recipe(recipe_id):
     success = RecipeService.delete(recipe_id)
     if not success:
@@ -78,7 +83,7 @@ def delete_recipe(recipe_id):
 
 
 # --- Ratings ---
-@bp.route('/recipes/<int:recipe_id>/ratings', methods=['POST'])
+@bp.route('/api/recipes/<int:recipe_id>/ratings', methods=['POST'])
 def add_rating(recipe_id):
     data = request.get_json() or {}
     rating, errors = RatingService.add_rating(recipe_id, data)
@@ -87,7 +92,7 @@ def add_rating(recipe_id):
     return jsonify(rating.to_dict()), 201
 
 
-@bp.route('/recipes/<int:recipe_id>/ratings', methods=['GET'])
+@bp.route('/api/recipes/<int:recipe_id>/ratings', methods=['GET'])
 def get_ratings(recipe_id):
     ratings = RatingService.get_ratings(recipe_id)
     return jsonify([r.to_dict() for r in ratings]), 200
