@@ -1,6 +1,6 @@
 # 🍽️ Food Recipe Manager API
 
-![CI](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/Apin-hue/APinUas/actions/workflows/ci.yml/badge.svg)
 
 REST API untuk manajemen resep makanan. Dibangun dengan Python + Flask sebagai Final Project Mata Kuliah Software Testing.
 
